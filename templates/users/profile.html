@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Platform - Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">Your Profile</h1>
+    
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <!-- User info section -->
+        <div class="p-6 flex items-start">
+            <div class="bg-indigo-500 text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold mr-4">
+                {{ user.username|first|upper }}
+            </div>
+            
+            <div>
+                <h2 class="text-2xl font-semibold">{{ user.username }}</h2>
+                <p class="text-gray-600">{{ user.email }}</p>
+                <p class="text-sm text-gray-500 mt-1">
+                    Member since: {{ user.date_joined|date:"F j, Y" }}
+                </p>
+            </div>
+        </div>
+        
+        <!-- Usage statistics -->
+        <div class="border-t p-6">
+            <h3 class="text-lg font-semibold mb-4">Usage Statistics</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-gray-50 p-4 rounded-lg border">
+                    <div class="text-3xl font-bold text-indigo-600 mb-1">{{ total_conversations }}</div>
+                    <div class="text-gray-600">Total Conversations</div>
+                </div>
+                
+                {% for provider, count in provider_counts.items %}
+                    <div class="bg-gray-50 p-4 rounded-lg border">
+                        <div class="text-3xl font-bold 
+                            {% if provider == 'openai' %}text-[#10a37f]{% elif provider == 'anthropic' %}text-[#b885f3]{% elif provider == 'google' %}text-[#4285f4]{% else %}text-gray-700{% endif %} 
+                            mb-1"
+                        >
+                            {{ count }}
+                        </div>
+                        <div class="text-gray-600">
+                            {% if provider == 'openai' %}OpenAI{% elif provider == 'anthropic' %}Anthropic{% elif provider == 'google' %}Google{% else %}{{ provider|title }}{% endif %} 
+                            Conversations
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="bg-gray-50 p-4 rounded-lg border col-span-2">
+                        <div class="text-gray-600">No model usage data yet</div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="flex justify-center">
+                <a href="{% url 'history' %}" class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition duration-200 flex items-center">
+                    <i data-lucide="history" class="w-4 h-4 mr-2"></i>
+                    View Conversation History
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

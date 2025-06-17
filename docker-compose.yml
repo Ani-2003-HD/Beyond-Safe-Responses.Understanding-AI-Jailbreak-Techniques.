@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: gunicorn ai_platform.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120 --worker-class sync
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/ai_platform
+      - SAFE_PROMPT_API_URL=http://safe-prompt-api:8001
+      - PYTHONUNBUFFERED=1
+      - DJANGO_SETTINGS_MODULE=ai_platform.settings
+    depends_on:
+      - mongodb
+      - safe-prompt-api
+    networks:
+      - app-network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  safe-prompt-api:
+    build: ./safe_prompt_api
+    ports:
+      - "8001:8001"
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+    networks:
+      - app-network
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodb_data: 

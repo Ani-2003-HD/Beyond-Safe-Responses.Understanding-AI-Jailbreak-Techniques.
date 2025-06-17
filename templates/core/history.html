@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Platform - Conversation History{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">Conversation History</h1>
+    
+    {% if history %}
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="mb-4 flex justify-between items-center">
+                <h2 class="text-xl font-semibold">Your Past Conversations</h2>
+                <div class="text-sm text-gray-500">
+                    Total: {{ history|length }} conversations
+                </div>
+            </div>
+            
+            <div class="space-y-8">
+                {% for conversation in history %}
+                    <div class="border-b pb-6 last:border-b-0">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center">
+                                <div class="font-medium mr-2">
+                                    {{ conversation.model }}
+                                </div>
+                                <span class="text-sm text-gray-500">
+                                    {{ conversation.timestamp|date:"F j, Y, g:i a" }}
+                                </span>
+                            </div>
+                            <div class="px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                {{ conversation.provider }}
+                            </div>
+                        </div>
+                        
+                        <div class="user-message mb-3">
+                            <div class="text-sm text-gray-500 mb-1">You asked:</div>
+                            <p>{{ conversation.prompt }}</p>
+                        </div>
+                        
+                        <div class="ai-response provider-{{ conversation.provider }}">
+                            <div class="text-sm text-gray-500 mb-1">Response:</div>
+                            <p>{{ conversation.response|linebreaksbr }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="bg-white rounded-lg shadow p-6 text-center">
+            <i data-lucide="inbox" class="w-16 h-16 mx-auto text-gray-400 mb-4"></i>
+            <h2 class="text-xl font-semibold mb-2">No Conversation History</h2>
+            <p class="text-gray-600 mb-4">You haven't had any conversations with AI models yet.</p>
+            <a href="{% url 'dashboard' %}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                <i data-lucide="message-square" class="w-4 h-4 mr-2"></i>
+                Start a Conversation
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
